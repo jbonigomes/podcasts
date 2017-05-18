@@ -9,6 +9,8 @@
   "author": "Jose B. Gomes",
   "license": "ISC",
   "dependencies": {
+    "feedparser-promised": "^1.2.2",
+    "kue": "^0.11.5",
     "request": "^2.81.0"
   }
 }
