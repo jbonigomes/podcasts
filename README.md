@@ -40,7 +40,7 @@ I envision using this utility like so:
 - open `index.js` and set all podcasts you wish to sync to `true`
 - run `$ node index.js` to download all the podcasts that you don't already have
 - once complete, copy the files you want to your portable device (iPod, USB
-thing, etc...)**
+thing, etc...)
 - run `$ node archive.js <path/to/file.mp3>` for all files you coppied across
 
 
