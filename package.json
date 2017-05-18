@@ -1,0 +1,14 @@
+{
+  "name": "podcasts",
+  "version": "1.0.0",
+  "description": "Podcasts downloader/manager",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jose B. Gomes",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.81.0"
+  }
+}
