@@ -9,8 +9,10 @@
   "author": "Jose B. Gomes",
   "license": "ISC",
   "dependencies": {
+    "colors": "^1.1.2",
     "feedparser-promised": "^1.2.2",
     "kue": "^0.11.5",
-    "request": "^2.81.0"
+    "request": "^2.81.0",
+    "request-progress": "^3.0.0"
   }
 }

@@ -3,7 +3,9 @@
  */
 const fs = require('fs');
 const kue = require('kue');
+const colours = require('colors');
 const request = require('request');
+const progress = require('request-progress');
 const feedparser = require('feedparser-promised');
 
 
@@ -17,7 +19,7 @@ const jobs = kue.createQueue();
  * Config
  */
 const urls = [{
-  active: false,
+  active: true,
   folder: './episodes/ngair',
   url: 'http://angularair.podbean.com/feed/',
 }, {
@@ -37,11 +39,11 @@ const urls = [{
   folder: './episodes/websecwarriors',
   url: 'https://feeds.feedwrench.com/websecwarriors.rss',
 }, {
-  active: false,
+  active: true,
   folder: './episodes/javascriptjabber',
   url: 'https://feeds.feedwrench.com/JavaScriptJabber.rss',
 }, {
-  active: false,
+  active: true,
   folder: './episodes/remoteconfs',
   url: 'https://feeds.feedwrench.com/remoteconfs-audio.rss',
 }, {
@@ -53,7 +55,7 @@ const urls = [{
   folder: './episodes/reactnativeradio',
   url: 'https://feeds.feedwrench.com/react-native-radio.rss',
 }, {
-  active: false,
+  active: true,
   folder: './episodes/angular',
   url: 'https://feeds.feedwrench.com/AdventuresInAngular.rss',
 }];
@@ -74,34 +76,37 @@ const canDownload = (folder, name) => {
  * The dirty work
  */
 urls.filter((url) => url.active).forEach((url) => {
-  feedparser.parse(url.url)
-    .then((xml) => {
-      xml.forEach((item) => {
-        const folder = url.folder;
-        const uri = item.enclosures[0].url;
-        const name = uri.split('/').pop().replace('?rss=true', '');
+  feedparser.parse(url.url).then((xml) => {
+    xml.forEach((item) => {
+      const folder = url.folder;
+      const uri = item.enclosures[0].url;
+      const name = uri.split('/').pop().replace('?rss=true', '');
 
-        const config = {
-          url: uri,
-          filename: name,
-          directory: folder,
-          followRedirect: true,
-        };
+      const config = {
+        url: uri,
+        title: name,
+        filename: name,
+        directory: folder,
+        followRedirect: true,
+      };
 
-        if (canDownload(folder, name)) {
-          jobs.create('get mp3s', config).removeOnComplete(true).save();
-        }
-      });
+      if (canDownload(folder, name)) {
+        console.log('how?');
+        // jobs.create('Downloading:', config).removeOnComplete(true).save();
+      }
     });
+  });
 });
 
 
 /*
  * Start processing the queue
  */
-jobs.process('get mp3s', 1, (job) => {
-  const path = `${job.data.directory}/${job.data.filename}`;
-  request.get(job.data).pipe(fs.createWriteStream(path));
+jobs.process('Downloading:', 3, (job, done) => {
+  progress(request.get(job.data), { throttle: 2000 })
+    .on('end', done)
+    .on('progress', (p) => job.progress(p.size.transferred, p.size.total))
+    .pipe(fs.createWriteStream(`${job.data.directory}/${job.data.filename}`));
 });
 
 
@@ -109,9 +114,19 @@ jobs.process('get mp3s', 1, (job) => {
  * Kick off the UI
  */
 kue.app.listen(3000);
+kue.app.set('title', 'Podcasts');
 
 
 /*
  * Inform the user
  */
-console.log('App started at: http://localhost:3000');
+console.log();
+console.log('----------------------------------------');
+console.log('----------------------------------------');
+console.log('                PODCASTS');
+console.log('----------------------------------------');
+console.log('App started at:');
+console.log(colours.blue('http://localhost:3000'));
+console.log('----------------------------------------');
+console.log('----------------------------------------');
+console.log();
